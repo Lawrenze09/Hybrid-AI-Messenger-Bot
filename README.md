@@ -8,9 +8,20 @@ The application has successfully passed the Meta App Review and is currently in 
 ## Tech Stack and Architecture
 * **Backend**: Flask (Python)
 * **Deployment**: Render (PaaS) with CI/CD integration.
-* **AI Engine**: Google Gemini 3 Flash Preview (Generative AI for NLP).
+* **AI Engine**: Google Gemini 3 Flash Preview.
 * **Platform**: Meta Graph API (Messenger Platform v21.0).
 * **Database**: In-memory state management for session-based handover.
+
+---
+
+## Operational Demo & Deployment Proof
+
+To demonstrate the system's reliability in a live environment, below is the verified production log of the Ace bot test:
+
+### Live Bot Interaction & Handover Verification
+This screenshot confirms that the bot is running in a production environment, successfully processing inquiries using the Gemini 3 Flash Preview engine. It also demonstrates the custom-engineered handover logic; by triggering the #admin command, the AI agent successfully pauses to allow for real-time human intervention.
+
+![Live-Bot-Deployment-Screenshot](Live-Bot-Deployment-Screenshot.png)
 
 ---
 
