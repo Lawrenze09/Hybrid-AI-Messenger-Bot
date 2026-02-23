@@ -14,6 +14,9 @@ GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
 genai.configure(api_key=GEMINI_API_KEY)
 model = genai.GenerativeModel('gemini-3-flash-preview')
 
+# In-memory storage for paused conversations (Handover logic)
+paused_users = set()
+
 @app.route("/", methods=['GET'])
 def verify():
     """Endpoint for Meta Webhook verification"""
@@ -30,7 +33,7 @@ def webhook():
             for messaging_event in entry.get("messaging"):
                 sender_id = messaging_event["sender"]["id"]
 
-                # Process Postback and Quick Reply payloads
+                # 1. PROCESS POSTBACK AND QUICK REPLY PAYLOADS
                 payload = None
                 if messaging_event.get("postback"):
                     payload = messaging_event["postback"].get("payload")
@@ -44,23 +47,36 @@ def webhook():
                         send_message(sender_id, "HOW TO ORDER:\n1. Screenshot item.\n2. Send details.\n3. Wait for confirmation.")
                     elif payload == "SHIPPING_INFO":
                         send_message(sender_id, "SHIPPING:\n- Metro Manila: 2-3 days\n- Provinces: 5-7 days via J&T")
+                    elif payload == "ADMIN_REQUEST": # Triggered from Persistent Menu
+                        paused_users.add(sender_id)
+                        send_message(sender_id, "We are redirecting you to our admin. Stand by.")
                     continue 
 
-                # Process standard text messages
+                # 2. PROCESS STANDARD TEXT MESSAGES
                 if messaging_event.get("message") and messaging_event["message"].get("text"):
                     message_text = messaging_event['message'].get('text', '').lower()
 
-                    # Keyword-based automated responses
+                    # --- HANDOVER LOGIC (ON/OFF SWITCH) ---
+                    if "#admin" in message_text:
+                        paused_users.add(sender_id)
+                        send_message(sender_id, "Bot disabled. An admin will assist you shortly.")
+                        continue
+                    elif "#bot" in message_text:
+                        paused_users.discard(sender_id)
+                        send_message(sender_id, "Bot reactivated. How can I help you, ya?")
+                        continue
+
+                    # Skip further processing if bot is paused for this user
+                    if sender_id in paused_users:
+                        continue
+
+                    # --- KEYWORD-BASED RESPONSES ---
                     if any(word in message_text for word in ["hm", "price", "presyo"]):
                         send_message(sender_id, "ACE APPAREL PRICES:\n- Graphic Tees: P500\n- Hoodies: P1,200\n- Caps: P350")
                     
                     elif any(word in message_text for word in ["available", "meron"]):
-                        send_message(sender_id, "AVAILABLE ITEMS:\n- Classic Ace Tee\n- Signature Hoodie\n- Trucker Caps\n\nAnong trip mo, ya? AKO???\nBADING!")
-                    
-                    elif any(word in message_text for word in ["hello", "hi"]):
-                        send_message(sender_id, "MAMA MO HELLO")
-                    
-                    # Fallback to AI generation for complex queries
+                        send_message(sender_id, "OUR CURRENT DROP:\n- Classic Ace Tee\n- Signature Hoodie\n- Trucker Caps\n\nLimited stocks only! Would you like to see the size chart or place an order?")        
+                    # --- FALLBACK TO AI GENERATION ---
                     else:
                         ai_reply = get_gemini_response(message_text)
                         send_message(sender_id, ai_reply)
@@ -68,7 +84,7 @@ def webhook():
     return "ok", 200
 
 def get_gemini_response(prompt):
-    """Generates a response using the Gemini API based on brand context"""
+    """Generates a response using Gemini based on brand context"""
     try:
         context = """
         You are the official AI assistant of 'Ace Apparel'. 
@@ -83,18 +99,15 @@ def get_gemini_response(prompt):
         3. Ace Signature Cap - P350
         
         Shipping: Nationwide via J&T (2-3 days MM, 5-7 days Provinces).
-        
-        Special Rule: If the user says 'hello' or 'hi', return only 'MAMA MO HELLO'.
         """
-        
         response = model.generate_content(context + "\nUser: " + prompt)
         return response.text
     except Exception as e:
         print(f"AI Error: {e}")
-        return "Internal system error. Please try again later."
+        return "We are handing you over to our admin to finalize your details."
 
 def send_message(recipient_id, text):
-    """Sends a message with predefined Quick Replies via the Send API"""
+    """Sends a message with Quick Replies via Send API"""
     url = f"https://graph.facebook.com/v21.0/me/messages?access_token={PAGE_ACCESS_TOKEN}"
     
     quick_replies = [
@@ -110,9 +123,7 @@ def send_message(recipient_id, text):
             "quick_replies": quick_replies
         }
     }
-    
-    response = requests.post(url, json=payload)
-    return response.json()
+    requests.post(url, json=payload)
 
 if __name__ == "__main__":
     app.run(port=5000)
