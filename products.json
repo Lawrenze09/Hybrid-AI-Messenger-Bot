@@ -1,0 +1,602 @@
+[
+  {
+    "id": "ACE-OVT-001",
+    "name": "Ace Onyx Stealth",
+    "keywords": ["oversized", "tee", "streetwear", "cotton", "heavyweight"],
+    "price": "₱450",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+OVT+001",
+    "description": "Premium heavyweight cotton tee with 300 GSM fabric for ultimate comfort and durability.",
+    "color": "Black"
+  },
+  {
+    "id": "ACE-OVT-002",
+    "name": "Ace Carbon Drift",
+    "keywords": ["oversized", "shirt", "streetwear", "casual", "relaxed"],
+    "price": "₱450",
+    "availability": "Limited Edition",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+OVT+002",
+    "description": "Oversized heavyweight cotton tee crafted with 280 GSM fabric for superior comfort.",
+    "color": "White"
+  },
+  {
+    "id": "ACE-OVT-003",
+    "name": "Ace Shadow Blaze",
+    "keywords": ["oversized", "tshirt", "urban", "streetwear", "minimalist"],
+    "price": "₱450",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+OVT+003",
+    "description": "High-quality heavyweight cotton tee featuring 320 GSM fabric for lasting wear.",
+    "color": "Red"
+  },
+  {
+    "id": "ACE-OVT-004",
+    "name": "Ace Midnight Edge",
+    "keywords": ["oversized", "top", "streetwear", "cotton", "comfortable"],
+    "price": "₱450",
+    "availability": "Low Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+OVT+004",
+    "description": "Premium oversized tee made with 350 GSM heavyweight cotton for ultimate style.",
+    "color": "Khaki"
+  },
+  {
+    "id": "ACE-OVT-005",
+    "name": "Ace Arctic Storm",
+    "keywords": ["oversized", "tee", "streetwear", "fashion", "urban"],
+    "price": "₱450",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+OVT+005",
+    "description": "Heavyweight cotton tee with 290 GSM fabric designed for streetwear enthusiasts.",
+    "color": "Black"
+  },
+  {
+    "id": "ACE-OVT-006",
+    "name": "Ace Phantom Wave",
+    "keywords": ["oversized", "shirt", "minimalist", "streetwear", "premium"],
+    "price": "₱450",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+OVT+006",
+    "description": "Oversized tee featuring 310 GSM heavyweight cotton for maximum comfort and style.",
+    "color": "White"
+  },
+  {
+    "id": "ACE-OVT-007",
+    "name": "Ace Eclipse Fade",
+    "keywords": ["oversized", "tshirt", "streetwear", "casual", "cotton"],
+    "price": "₱450",
+    "availability": "Limited Edition",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+OVT+007",
+    "description": "Premium heavyweight cotton tee with 340 GSM fabric for superior durability.",
+    "color": "Red"
+  },
+  {
+    "id": "ACE-OVT-008",
+    "name": "Ace Urban Fusion",
+    "keywords": ["oversized", "tee", "urban", "streetwear", "modern"],
+    "price": "₱450",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+OVT+008",
+    "description": "High-quality oversized tee crafted with 270 GSM heavyweight cotton fabric.",
+    "color": "Khaki"
+  },
+  {
+    "id": "ACE-OVT-009",
+    "name": "Ace Metro Vibe",
+    "keywords": ["oversized", "shirt", "streetwear", "fashion", "comfortable"],
+    "price": "₱450",
+    "availability": "Low Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+OVT+009",
+    "description": "Oversized heavyweight cotton tee featuring 330 GSM fabric for everyday wear.",
+    "color": "Black"
+  },
+  {
+    "id": "ACE-OVT-010",
+    "name": "Ace Street Pulse",
+    "keywords": ["oversized", "tee", "streetwear", "premium", "minimalist"],
+    "price": "₱450",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+OVT+010",
+    "description": "Premium oversized tee made with 360 GSM heavyweight cotton for ultimate comfort.",
+    "color": "White"
+  },
+  {
+    "id": "ACE-MSH-001",
+    "name": "Ace Velocity Flow",
+    "keywords": ["mesh", "shorts", "breathable", "athletic", "sportswear"],
+    "price": "₱400",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+MSH+001",
+    "description": "Breathable double-layered mesh shorts engineered for maximum airflow and comfort.",
+    "color": "Black"
+  },
+  {
+    "id": "ACE-MSH-002",
+    "name": "Ace Breeze Sprint",
+    "keywords": ["mesh", "shorts", "athletic", "sports", "performance"],
+    "price": "₱400",
+    "availability": "Limited Edition",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+MSH+002",
+    "description": "Double-layered mesh shorts with breathable fabric for superior ventilation.",
+    "color": "White"
+  },
+  {
+    "id": "ACE-MSH-003",
+    "name": "Ace Aero Glide",
+    "keywords": ["mesh", "shorts", "lightweight", "breathable", "athletic"],
+    "price": "₱400",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+MSH+003",
+    "description": "Premium breathable double-layered mesh shorts designed for active lifestyles.",
+    "color": "Red"
+  },
+  {
+    "id": "ACE-MSH-004",
+    "name": "Ace Crossover Flex",
+    "keywords": ["mesh", "shorts", "sports", "flexible", "comfortable"],
+    "price": "₱400",
+    "availability": "Low Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+MSH+004",
+    "description": "Double-layered mesh shorts featuring breathable fabric for optimal performance.",
+    "color": "Khaki"
+  },
+  {
+    "id": "ACE-MSH-005",
+    "name": "Ace Rush Track",
+    "keywords": ["mesh", "shorts", "athletic", "breathable", "sports"],
+    "price": "₱400",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+MSH+005",
+    "description": "Breathable double-layered mesh shorts crafted for maximum comfort during workouts.",
+    "color": "Black"
+  },
+  {
+    "id": "ACE-MSH-006",
+    "name": "Ace Swift Motion",
+    "keywords": ["mesh", "shorts", "performance", "athletic", "lightweight"],
+    "price": "₱400",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+MSH+006",
+    "description": "Premium double-layered mesh shorts with breathable technology for active wear.",
+    "color": "White"
+  },
+  {
+    "id": "ACE-MSH-007",
+    "name": "Ace Circuit Run",
+    "keywords": ["mesh", "shorts", "sports", "breathable", "training"],
+    "price": "₱400",
+    "availability": "Limited Edition",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+MSH+007",
+    "description": "Breathable double-layered mesh shorts engineered for high-intensity activities.",
+    "color": "Red"
+  },
+  {
+    "id": "ACE-MSH-008",
+    "name": "Ace Dynamic Stride",
+    "keywords": ["mesh", "shorts", "athletic", "comfortable", "sports"],
+    "price": "₱400",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+MSH+008",
+    "description": "Double-layered mesh shorts featuring breathable fabric for all-day comfort.",
+    "color": "Khaki"
+  },
+  {
+    "id": "ACE-MSH-009",
+    "name": "Ace Apex Move",
+    "keywords": ["mesh", "shorts", "performance", "breathable", "athletic"],
+    "price": "₱400",
+    "availability": "Low Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+MSH+009",
+    "description": "Premium breathable double-layered mesh shorts designed for peak performance.",
+    "color": "Black"
+  },
+  {
+    "id": "ACE-MSH-010",
+    "name": "Ace Flash Core",
+    "keywords": ["mesh", "shorts", "sports", "lightweight", "breathable"],
+    "price": "₱400",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+MSH+010",
+    "description": "Breathable double-layered mesh shorts crafted for ultimate athletic performance.",
+    "color": "White"
+  },
+  {
+    "id": "ACE-OVD-001",
+    "name": "Ace Thunder Drop",
+    "keywords": ["hoodie", "oversized", "streetwear", "fleece", "comfortable"],
+    "price": "₱1000",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+OVD+001",
+    "description": "Premium French Terry Fleece hoodie designed for ultimate warmth and streetwear style.",
+    "color": "Black"
+  },
+  {
+    "id": "ACE-OVD-002",
+    "name": "Ace Storm Fleece",
+    "keywords": ["hoodie", "oversized", "warm", "streetwear", "premium"],
+    "price": "₱1000",
+    "availability": "Limited Edition",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+OVD+002",
+    "description": "Oversized hoodie crafted with premium French Terry Fleece for superior comfort.",
+    "color": "White"
+  },
+  {
+    "id": "ACE-OVD-003",
+    "name": "Ace Cloud Rider",
+    "keywords": ["hoodie", "oversized", "streetwear", "cozy", "fleece"],
+    "price": "₱1000",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+OVD+003",
+    "description": "Premium French Terry Fleece hoodie featuring oversized fit for modern streetwear.",
+    "color": "Red"
+  },
+  {
+    "id": "ACE-OVD-004",
+    "name": "Ace Atlas Layer",
+    "keywords": ["hoodie", "oversized", "comfortable", "streetwear", "warm"],
+    "price": "₱1000",
+    "availability": "Low Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+OVD+004",
+    "description": "Oversized hoodie made with premium French Terry Fleece for all-day comfort.",
+    "color": "Khaki"
+  },
+  {
+    "id": "ACE-OVD-005",
+    "name": "Ace Summit Chill",
+    "keywords": ["hoodie", "oversized", "streetwear", "fleece", "stylish"],
+    "price": "₱1000",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+OVD+005",
+    "description": "Premium French Terry Fleece hoodie designed for maximum warmth and style.",
+    "color": "Black"
+  },
+  {
+    "id": "ACE-OVD-006",
+    "name": "Ace Altitude Wrap",
+    "keywords": ["hoodie", "oversized", "comfortable", "streetwear", "premium"],
+    "price": "₱1000",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+OVD+006",
+    "description": "Oversized hoodie featuring premium French Terry Fleece for superior comfort.",
+    "color": "White"
+  },
+  {
+    "id": "ACE-OVD-007",
+    "name": "Ace Peak Comfort",
+    "keywords": ["hoodie", "oversized", "streetwear", "warm", "fleece"],
+    "price": "₱1000",
+    "availability": "Limited Edition",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+OVD+007",
+    "description": "Premium French Terry Fleece hoodie crafted for ultimate streetwear comfort.",
+    "color": "Red"
+  },
+  {
+    "id": "ACE-OVD-008",
+    "name": "Ace Zenith Cozy",
+    "keywords": ["hoodie", "oversized", "comfortable", "streetwear", "stylish"],
+    "price": "₱1000",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+OVD+008",
+    "description": "Oversized hoodie made with premium French Terry Fleece for everyday wear.",
+    "color": "Khaki"
+  },
+  {
+    "id": "ACE-OVD-009",
+    "name": "Ace Everest Warmth",
+    "keywords": ["hoodie", "oversized", "streetwear", "fleece", "warm"],
+    "price": "₱1000",
+    "availability": "Low Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+OVD+009",
+    "description": "Premium French Terry Fleece hoodie designed for maximum warmth and comfort.",
+    "color": "Black"
+  },
+  {
+    "id": "ACE-OVD-010",
+    "name": "Ace Apex Hood",
+    "keywords": ["hoodie", "oversized", "streetwear", "premium", "comfortable"],
+    "price": "₱1000",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+OVD+010",
+    "description": "Oversized hoodie featuring premium French Terry Fleece for ultimate streetwear style.",
+    "color": "White"
+  },
+  {
+    "id": "ACE-JSY-001",
+    "name": "Ace Gameday Icon",
+    "keywords": ["jersey", "sports", "athletic", "dryfit", "performance"],
+    "price": "₱250",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+JSY+001",
+    "description": "Moisture-wicking dry-fit fabric jersey engineered for peak athletic performance.",
+    "color": "Black"
+  },
+  {
+    "id": "ACE-JSY-002",
+    "name": "Ace Court Legend",
+    "keywords": ["jersey", "athletic", "sports", "breathable", "dryfit"],
+    "price": "₱250",
+    "availability": "Limited Edition",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+JSY+002",
+    "description": "Performance jersey crafted with moisture-wicking dry-fit fabric for optimal comfort.",
+    "color": "White"
+  },
+  {
+    "id": "ACE-JSY-003",
+    "name": "Ace Field Pro",
+    "keywords": ["jersey", "sports", "performance", "athletic", "dryfit"],
+    "price": "₱250",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+JSY+003",
+    "description": "Premium moisture-wicking dry-fit fabric jersey designed for serious athletes.",
+    "color": "Red"
+  },
+  {
+    "id": "ACE-JSY-004",
+    "name": "Ace Arena Elite",
+    "keywords": ["jersey", "athletic", "sports", "comfortable", "dryfit"],
+    "price": "₱250",
+    "availability": "Low Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+JSY+004",
+    "description": "High-performance jersey featuring moisture-wicking dry-fit fabric technology.",
+    "color": "Khaki"
+  },
+  {
+    "id": "ACE-JSY-005",
+    "name": "Ace Victory Mesh",
+    "keywords": ["jersey", "sports", "breathable", "athletic", "performance"],
+    "price": "₱250",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+JSY+005",
+    "description": "Moisture-wicking dry-fit fabric jersey engineered for maximum breathability.",
+    "color": "Black"
+  },
+  {
+    "id": "ACE-JSY-006",
+    "name": "Ace Champion Draft",
+    "keywords": ["jersey", "athletic", "sports", "dryfit", "comfortable"],
+    "price": "₱250",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+JSY+006",
+    "description": "Premium jersey crafted with moisture-wicking dry-fit fabric for all-day wear.",
+    "color": "White"
+  },
+  {
+    "id": "ACE-JSY-007",
+    "name": "Ace Roster Prime",
+    "keywords": ["jersey", "sports", "performance", "athletic", "breathable"],
+    "price": "₱250",
+    "availability": "Limited Edition",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+JSY+007",
+    "description": "High-performance jersey featuring moisture-wicking dry-fit fabric for athletes.",
+    "color": "Red"
+  },
+  {
+    "id": "ACE-JSY-008",
+    "name": "Ace Division Ace",
+    "keywords": ["jersey", "athletic", "sports", "dryfit", "performance"],
+    "price": "₱250",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+JSY+008",
+    "description": "Moisture-wicking dry-fit fabric jersey designed for ultimate athletic comfort.",
+    "color": "Khaki"
+  },
+  {
+    "id": "ACE-JSY-009",
+    "name": "Ace League Star",
+    "keywords": ["jersey", "sports", "breathable", "athletic", "comfortable"],
+    "price": "₱250",
+    "availability": "Low Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+JSY+009",
+    "description": "Premium moisture-wicking dry-fit fabric jersey crafted for peak performance.",
+    "color": "Black"
+  },
+  {
+    "id": "ACE-JSY-010",
+    "name": "Ace Playoff Hero",
+    "keywords": ["jersey", "athletic", "sports", "performance", "dryfit"],
+    "price": "₱250",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+JSY+010",
+    "description": "High-quality jersey featuring moisture-wicking dry-fit fabric for athletes.",
+    "color": "White"
+  },
+  {
+    "id": "ACE-SCK-001",
+    "name": "Ace Cushion Stride",
+    "keywords": ["socks", "comfortable", "cotton", "cushioned", "athletic"],
+    "price": "₱150",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+SCK+001",
+    "description": "High-density cushion cotton socks engineered for maximum comfort and support.",
+    "color": "Black"
+  },
+  {
+    "id": "ACE-SCK-002",
+    "name": "Ace Comfort Step",
+    "keywords": ["socks", "cotton", "comfortable", "cushioned", "soft"],
+    "price": "₱150",
+    "availability": "Limited Edition",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+SCK+002",
+    "description": "Premium high-density cushion cotton socks designed for all-day comfort.",
+    "color": "White"
+  },
+  {
+    "id": "ACE-SCK-003",
+    "name": "Ace Plush Walk",
+    "keywords": ["socks", "comfortable", "cotton", "soft", "cushioned"],
+    "price": "₱150",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+SCK+003",
+    "description": "High-density cushion cotton socks crafted for superior comfort and durability.",
+    "color": "Red"
+  },
+  {
+    "id": "ACE-SCK-004",
+    "name": "Ace Soft Tread",
+    "keywords": ["socks", "cotton", "cushioned", "comfortable", "athletic"],
+    "price": "₱150",
+    "availability": "Low Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+SCK+004",
+    "description": "Premium socks featuring high-density cushion cotton for maximum support.",
+    "color": "Khaki"
+  },
+  {
+    "id": "ACE-SCK-005",
+    "name": "Ace Cozy Foot",
+    "keywords": ["socks", "comfortable", "cotton", "soft", "cushioned"],
+    "price": "₱150",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+SCK+005",
+    "description": "High-density cushion cotton socks engineered for ultimate comfort and fit.",
+    "color": "Black"
+  },
+  {
+    "id": "ACE-SCK-006",
+    "name": "Ace Cloud Sock",
+    "keywords": ["socks", "cotton", "comfortable", "cushioned", "premium"],
+    "price": "₱150",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+SCK+006",
+    "description": "Premium high-density cushion cotton socks designed for everyday wear.",
+    "color": "White"
+  },
+  {
+    "id": "ACE-SCK-007",
+    "name": "Ace Elite Comfort",
+    "keywords": ["socks", "comfortable", "cotton", "athletic", "cushioned"],
+    "price": "₱150",
+    "availability": "Limited Edition",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+SCK+007",
+    "description": "High-density cushion cotton socks crafted for superior athletic performance.",
+    "color": "Red"
+  },
+  {
+    "id": "ACE-SCK-008",
+    "name": "Ace Premium Step",
+    "keywords": ["socks", "cotton", "comfortable", "soft", "cushioned"],
+    "price": "₱150",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+SCK+008",
+    "description": "Premium socks featuring high-density cushion cotton for all-day comfort.",
+    "color": "Khaki"
+  },
+  {
+    "id": "ACE-SCK-009",
+    "name": "Ace Luxury Stride",
+    "keywords": ["socks", "comfortable", "cotton", "premium", "cushioned"],
+    "price": "₱150",
+    "availability": "Low Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+SCK+009",
+    "description": "High-density cushion cotton socks engineered for maximum support and comfort.",
+    "color": "Black"
+  },
+  {
+    "id": "ACE-SCK-010",
+    "name": "Ace Supreme Cushion",
+    "keywords": ["socks", "cotton", "comfortable", "cushioned", "athletic"],
+    "price": "₱150",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+SCK+010",
+    "description": "Premium high-density cushion cotton socks designed for ultimate comfort.",
+    "color": "White"
+  },
+  {
+    "id": "ACE-GYS-001",
+    "name": "Ace Muscle Fit",
+    "keywords": ["sando", "gym", "athletic", "tank", "workout"],
+    "price": "₱150",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+GYS+001",
+    "description": "Stretchable performance rib gym sando engineered for unrestricted movement.",
+    "color": "Black"
+  },
+  {
+    "id": "ACE-GYS-002",
+    "name": "Ace Lift Elite",
+    "keywords": ["sando", "gym", "athletic", "workout", "performance"],
+    "price": "₱150",
+    "availability": "Limited Edition",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+GYS+002",
+    "description": "Premium gym sando crafted with stretchable performance rib for maximum flexibility.",
+    "color": "White"
+  },
+  {
+    "id": "ACE-GYS-003",
+    "name": "Ace Rep Master",
+    "keywords": ["sando", "gym", "athletic", "tank", "fitness"],
+    "price": "₱150",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+GYS+003",
+    "description": "High-performance gym sando featuring stretchable performance rib fabric.",
+    "color": "Red"
+  },
+  {
+    "id": "ACE-GYS-004",
+    "name": "Ace Pump Core",
+    "keywords": ["sando", "gym", "workout", "athletic", "comfortable"],
+    "price": "₱150",
+    "availability": "Low Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+GYS+004",
+    "description": "Stretchable performance rib gym sando designed for intense workout sessions.",
+    "color": "Khaki"
+  },
+  {
+    "id": "ACE-GYS-005",
+    "name": "Ace Iron Tank",
+    "keywords": ["sando", "gym", "athletic", "tank", "performance"],
+    "price": "₱150",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+GYS+005",
+    "description": "Premium gym sando crafted with stretchable performance rib for optimal movement.",
+    "color": "Black"
+  },
+  {
+    "id": "ACE-GYS-006",
+    "name": "Ace Gains Pro",
+    "keywords": ["sando", "gym", "workout", "athletic", "fitness"],
+    "price": "₱150",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+GYS+006",
+    "description": "Stretchable performance rib gym sando engineered for serious athletes.",
+    "color": "White"
+  },
+  {
+    "id": "ACE-GYS-007",
+    "name": "Ace Shred Fit",
+    "keywords": ["sando", "gym", "athletic", "tank", "performance"],
+    "price": "₱150",
+    "availability": "Limited Edition",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+GYS+007",
+    "description": "High-performance gym sando featuring stretchable performance rib technology.",
+    "color": "Red"
+  },
+  {
+    "id": "ACE-GYS-008",
+    "name": "Ace Beast Mode",
+    "keywords": ["sando", "gym", "workout", "athletic", "comfortable"],
+    "price": "₱150",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+GYS+008",
+    "description": "Premium gym sando crafted with stretchable performance rib for all-day comfort.",
+    "color": "Khaki"
+  },
+  {
+    "id": "ACE-GYS-009",
+    "name": "Ace Grind Tank",
+    "keywords": ["sando", "gym", "athletic", "tank", "fitness"],
+    "price": "₱150",
+    "availability": "Low Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+GYS+009",
+    "description": "Stretchable performance rib gym sando designed for maximum workout performance.",
+    "color": "Black"
+  },
+  {
+    "id": "ACE-GYS-010",
+    "name": "Ace Power Sleeve",
+    "keywords": ["sando", "gym", "workout", "athletic", "performance"],
+    "price": "₱150",
+    "availability": "In Stock",
+    "image_url": "https://via.placeholder.com/500x500.png?text=Ace+GYS+010",
+    "description": "Premium gym sando featuring stretchable performance rib for ultimate flexibility.",
+    "color": "White"
+  }
+]
