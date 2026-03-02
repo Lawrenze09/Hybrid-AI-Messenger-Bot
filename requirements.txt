@@ -3,3 +3,4 @@ google-generativeai
 requests
 apscheduler
 python-dotenv
+gunicorn
