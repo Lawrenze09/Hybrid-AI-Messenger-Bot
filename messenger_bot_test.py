@@ -338,17 +338,24 @@ def create_product_carousel(products, sender_id):
     elements = []
     
     for product in products[:10]:  # Max 10 cards
+        product_id = product.get('id', 'no-id')
+        title = product.get('name', 'Ace Product')
+        img = product.get('image_url', 'https://via.placeholder.com/500')
+        price = product.get('price', '₱0')
+        desc = product.get('description', '')
+        subtitle = f"{price} - {desc}"[:80]
+        
         element = {
-            "title": product.get('name', 'Product'),
-            "image_url": product.get('image_url', 'https://via.placeholder.com/300'),
-            "subtitle": product.get('description', '')[:80],  # Max 80 chars
+            "title": title,
+            "image_url": img,
+            "subtitle": subtitle,
             "buttons": [
                 {
                     "type": "postback",
                     "title": "View Price",
                     "payload": json.dumps({
                         "action": "view_price",
-                        "product_id": product['id']
+                        "product_id": product_id
                     })
                 }
             ]
@@ -371,7 +378,7 @@ def handle_view_price_postback(product_id, sender_id, user_first_name):
     Send price and availability details.
     """
     products = bot_state.get_products()
-    product = next((p for p in products if str(p['id']) == str(product_id)), None)
+    product = next((p for p in products if str(p.get('id', '')) == str(product_id)), None)
     
     if not product:
         send_facebook_message(sender_id, {
@@ -782,3 +789,4 @@ if __name__ == '__main__':
     except Exception as e:
         logger.error(f"Failed to start application: {e}")
         raise
+
