@@ -1,0 +1,55 @@
+# Secrets - NEVER commit these
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+secrets/
+/etc/secrets/
+
+# Python runtime
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.env/
+
+# Packaging
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Testing and Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# Type checking
+.mypy_cache/
+
+# IDEs and Editor configs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Logs and Deployment
+*.log
+logs/
+.render/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
