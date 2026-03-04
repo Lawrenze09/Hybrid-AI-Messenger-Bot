@@ -139,7 +139,7 @@ Customer ({first_name}): {message}
 Sofia:"""
 
 _SOFIA_INTRO = (
-    "Hello! I'm Sofia, your Ace Apparel assistant. 👋\n\n"
+    "I'm Sofia, your Ace Apparel assistant. 👋\n\n"
     "Feel free to ask me anything — Oversized Tees, Mesh Shorts, "
     "Hoodies, Jerseys, Socks, and Gym Sandos. "
     "I'm here to help you find the right fit! 😊"
@@ -1046,3 +1046,4 @@ if __name__ == "__main__":
     _validate_env()
     _startup()
     app.run(host="0.0.0.0", port=int(os.getenv("PORT", "5000")), debug=False)
+
