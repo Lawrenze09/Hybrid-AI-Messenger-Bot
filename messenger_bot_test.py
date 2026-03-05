@@ -14,7 +14,7 @@ Data contract (products.json):
   - keywords    : list[str]   — all lowercase, no currency symbols
   - price       : int | float — numeric only (e.g. 450, not "₱450")
   - category    : str         — "oversized_tee" | "mesh_short" | "hoodie" | etc.
-  - availability: str         — "Available" | "Out of Stock"
+  - availability: str         — "In Stock" | "Limited Edition" | "Low Stock" | "Out of Stock"
 
 Deployment : Render (gunicorn messenger_bot_test:app)
 Python     : 3.11+
@@ -136,6 +136,15 @@ Rules:
 HANDOVER_KEYWORDS = frozenset({
     "refund", "complaint", "complain", "admin", "manager", "supervisor",
     "problema", "issue", "reklamo", "balik", "return", "problem", "cancel",
+})
+
+# Greeting words intercepted AFTER first-time greeting has already fired.
+# Prevents Gemini from re-greeting a user who was already welcomed via
+# Get Started button or a previous first message.
+_GREETING_KEYWORDS = frozenset({
+    "hi", "hello", "hey", "kumusta", "kamusta", "musta", "good morning",
+    "good afternoon", "good evening", "magandang umaga", "magandang hapon",
+    "magandang gabi", "sup", "yo",
 })
 
 # Flask app
@@ -403,12 +412,12 @@ def _apply_price_filter(
 
 
 def _stock_label(availability: str) -> str:
-    """Map products.json availability to display label."""
+    """Map products.json availability string to a display label."""
     labels = {
-        "In Stock": "Available",
+        "In Stock":        "Available",
         "Limited Edition": "Limited Ed.",
-        "Low Stock": "Low Stock",
-        "Out of Stock": "Out of Stock",
+        "Low Stock":       "Low Stock",
+        "Out of Stock":    "Out of Stock",
     }
     return labels.get(str(availability).strip(), "Out of Stock")
 
@@ -577,7 +586,7 @@ def send_carousel(psid: str, products: list[dict]) -> bool:
         ``True`` on success.
     """
     if not products:
-        return send_text(psid, "Naku, pasensya na po... hindi ko po mahanap yan sa catalog namin")
+        return send_text(psid, "Naku, pasensya na po... hindi ko po mahanap yan sa catalog namin.")
 
     elements = []
     for p in products[:10]:
@@ -586,8 +595,7 @@ def send_carousel(psid: str, products: list[dict]) -> bool:
             price_display = f"₱{int(float(raw_price)):,}"
         except (ValueError, TypeError):
             price_display = "Contact us for price"
-        _avail      = p.get("availability", "")
-        stock_label = _stock_label(p.get("availability", ""))  
+        stock_label = _stock_label(p.get("availability", ""))
         elements.append({
             "title":     str(p.get("name", "Ace Product"))[:80],
             "image_url": p.get("image_url", "https://via.placeholder.com/500x500.png"),
@@ -648,7 +656,6 @@ def _send_product_detail(psid: str, product: dict, first_name: str) -> None:
         price_display = f"₱{int(float(raw_price)):,}"
     except (ValueError, TypeError):
         price_display = "Contact us for price"
-    _avail      = product.get("availability", "")
     stock_label = _stock_label(product.get("availability", ""))
     send_text(psid, (
         f"{product.get('name')}\n"
@@ -710,14 +717,37 @@ def _notify_admin(psid: str, message: str, profile: dict) -> bool:
 # ============================================================================
 
 
+def _send_first_time_greeting(psid: str) -> None:
+    """Send the welcome message + default carousel.
+
+    Shared by both _handle_message (first text) and _handle_postback
+    (Get Started button). Always call _is_first_time(psid) before this —
+    this function does not check it itself.
+    """
+    profile    = _get_user_profile(psid)
+    first_name = profile.get("first_name", "Customer")
+    send_text(psid, (
+        f"Hi {first_name}! I'm Sofia, your AI assistant for Ace Apparel.\n\n"
+        f"Feel free to ask me anything — Oversized Tees, Mesh Shorts, "
+        f"Hoodies, Jerseys, Socks, and Gym Sandos. "
+        f"I'm here to help you find the right fit!"
+    ))
+    default_products = _build_default_carousel()
+    if default_products:
+        send_text(psid, "Here are some of our popular items po:")
+        send_carousel(psid, default_products)
+
+
 def _handle_message(psid: str, raw_text: str) -> None:
     """Route one incoming customer message through the hybrid engine.
 
     Processing order (strict — do not reorder):
       1. First-time greeting + default carousel  (rule-based, fires once per user)
       2. Admin handover keywords                 (rule-based, pause this thread)
-      3. Product SKU / keyword / price search    (rule-based, JSON = source of truth)
-      4. Gemini conversational fallback          (LLM, only when 1-3 don't apply)
+      3. Catalog browse trigger                  (rule-based, explicit browse intent)
+      4. Greeting intercept                      (prevents Gemini re-greeting)
+      5. Product SKU / keyword / price search    (rule-based, JSON = source of truth)
+      6. Gemini conversational fallback          (LLM, only when 1-5 don't apply)
 
     Args:
         psid:     Sender's Facebook Page-Scoped User ID.
@@ -734,18 +764,7 @@ def _handle_message(psid: str, raw_text: str) -> None:
 
         # ── Step 1: First-time greeting + default carousel ───────────────────
         if _is_first_time(psid):
-            send_text(psid, (
-                f"Hi {first_name}! I'm Sofia, your AI assistant for Ace Apparel.\n\n"
-                f"Feel free to ask me anything — Oversized Tees, Mesh Shorts, "
-                f"Hoodies, Jerseys, Socks, and Gym Sandos. "
-                f"I'm here to help you find the right fit!"
-            ))
-            default_products = _build_default_carousel()
-            if default_products:
-                send_text(psid, "Here are some of our popular items po:")
-                send_carousel(psid, default_products)
-            # Return here so the triggering message (often "hi") isn't also
-            # processed through the product engine on the very first interaction.
+            _send_first_time_greeting(psid)
             return
 
         # ── Step 2: Admin handover ────────────────────────────────────────────
@@ -758,7 +777,7 @@ def _handle_message(psid: str, raw_text: str) -> None:
             _set_paused(psid, True)
             return
 
-        # Explicit catalog browse trigger
+        # ── Step 3: Explicit catalog browse trigger ───────────────────────────
         if any(kw in text for kw in ("products", "product", "catalog", "catalogue", "browse", "listahan")):
             default_products = _build_default_carousel()
             if default_products:
@@ -768,7 +787,20 @@ def _handle_message(psid: str, raw_text: str) -> None:
                 send_text(psid, "Naku, pasensya na po... wala pang products sa catalog.")
             return
 
-        # ── Step 3: Product keyword / SKU / price search ─────────────────────
+        # ── Step 4: Greeting intercept ────────────────────────────────────────
+        # If the user says "hi/hello" AFTER the first-time greeting has already
+        # fired (e.g. they clicked Get Started, then typed "hi"), respond with
+        # a short acknowledgement + catalog instead of routing to Gemini, which
+        # would produce a second full greeting and confuse the customer.
+        if text in _GREETING_KEYWORDS or any(text.startswith(kw) for kw in _GREETING_KEYWORDS):
+            send_text(psid, f"Nandito pa po ako, {first_name}! Paano kita matutulungan?")
+            default_products = _build_default_carousel()
+            if default_products:
+                send_text(psid, "Here are some of our popular items po:")
+                send_carousel(psid, default_products)
+            return
+
+        # ── Step 5: Product keyword / SKU / price search ─────────────────────
         matches = _search_products(text)
         if matches:
             if len(matches) == 1:
@@ -782,9 +814,9 @@ def _handle_message(psid: str, raw_text: str) -> None:
                 send_carousel(psid, matches)
             return
 
-        # ── Step 4: Gemini conversational fallback ────────────────────────────
-        # Only reaches here if no rule matched — greetings, sizing questions,
-        # shipping queries, general brand conversation.
+        # ── Step 6: Gemini conversational fallback ────────────────────────────
+        # Only reaches here if no rule matched — sizing questions, shipping
+        # queries, general brand conversation.
         send_text(psid, _get_gemini_reply(raw_text, first_name))
 
     except Exception:
@@ -797,7 +829,7 @@ def _handle_message(psid: str, raw_text: str) -> None:
 def _get_gemini_reply(user_message: str, first_name: str) -> str:
     """Generate a Gemini response for messages that didn't match any rule.
 
-    Gemini handles conversational queries — greetings, sizing, shipping, etc.
+    Gemini handles conversational queries — sizing, shipping, etc.
     The system instruction explicitly forbids it from stating prices or inventing
     product details; all product data must come from the rule engine.
 
@@ -818,8 +850,8 @@ def _get_gemini_reply(user_message: str, first_name: str) -> str:
     except Exception as exc:
         logger.error("Gemini error: %s", exc)
         return (
-            f"Pasensya na po, {first_name}, may konting issue kami."
-            f"Subukan po ulit mamaya o mag-type ng 'products' para makita ang default carousel."
+            f"Pasensya na po, {first_name}, may konting issue kami. "
+            f"Subukan po ulit mamaya o mag-type ng 'products' para makita ang aming catalog."
         )
 
 
@@ -854,13 +886,17 @@ def _handle_admin_echo(event: dict) -> None:
 
 
 def _handle_postback(psid: str, raw_payload: str) -> None:
-    """Route a postback event from a carousel 'View Details' button.
+    """Route a postback event from a carousel button or the Get Started button.
+
+    GET_STARTED is a plain string — json.loads() raises JSONDecodeError for it,
+    so it is handled in the except block. All carousel button payloads are JSON.
 
     Args:
         psid:        Sender's Facebook Page-Scoped User ID.
         raw_payload: Raw payload string from the postback event.
     """
     raw_payload = raw_payload[:MAX_PAYLOAD_CHARS]
+
     try:
         data       = json.loads(raw_payload)
         profile    = _get_user_profile(psid)
@@ -883,7 +919,21 @@ def _handle_postback(psid: str, raw_payload: str) -> None:
             logger.warning("Unknown postback action: %s", data.get("action"))
 
     except json.JSONDecodeError:
-        # Persistent-menu buttons send plain strings, not JSON — expected.
+        # GET_STARTED is a plain string — not valid JSON. Handle it here.
+        if raw_payload.strip().upper() == "GET_STARTED":
+            if _is_first_time(psid):
+                # First ever interaction — send full welcome greeting + carousel.
+                _send_first_time_greeting(psid)
+            else:
+                # Already greeted (user opened chat before) — show catalog only.
+                profile    = _get_user_profile(psid)
+                first_name = profile.get("first_name", "Customer")
+                send_text(psid, f"Nandito pa po ako, {first_name}! Paano kita matutulungan?")
+                default_products = _build_default_carousel()
+                if default_products:
+                    send_text(psid, "Here are some of our popular items po:")
+                    send_carousel(psid, default_products)
+            return
         logger.info("Plain-string postback: %s", raw_payload[:60])
     except Exception as exc:
         logger.error("_handle_postback error: %s", exc)
@@ -1074,7 +1124,9 @@ def _startup() -> None:
     _refresh_cache()  # populate immediately on boot, don't wait 60 min
 
 
+# Module-level startup — runs when Gunicorn imports this module (Render deployment).
+_validate_env()
+_startup()
+
 if __name__ == "__main__":
-    _validate_env()
-    _startup()
     app.run(host="0.0.0.0", port=int(os.getenv("PORT", "5000")), debug=False)
