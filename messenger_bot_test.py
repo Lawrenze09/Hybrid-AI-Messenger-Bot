@@ -904,8 +904,10 @@ def _startup() -> None:
     )
 
     def _process_one(ev: dict) -> None:
+        logger.info("Event keys: %s", list(ev.keys()))
         psid = ev.get("sender", {}).get("id")
         if not psid:
+            logger.info("No PSID found in event — skipping.")
             return
 
         if "message" in ev:
@@ -987,3 +989,4 @@ _startup()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.getenv("PORT", "5000")), debug=False)
+
