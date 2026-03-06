@@ -989,10 +989,11 @@ def _startup() -> None:
 
 # Module-level startup — runs when Gunicorn imports this module.
 _validate_env()
-_startup()
-
+# _startup() is called by gunicorn post_fork hook in gunicorn.conf.py
 if __name__ == "__main__":
+    _startup()
     app.run(host="0.0.0.0", port=int(os.getenv("PORT", "5000")), debug=False)
+
 
 
 
