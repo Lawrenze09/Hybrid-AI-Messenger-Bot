@@ -6,6 +6,7 @@
 [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![Flask](https://img.shields.io/badge/Flask-3.x-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com)
 [![Gemini AI](https://img.shields.io/badge/Gemini_2.5_Flash_Lite-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev)
+[![Redis](https://img.shields.io/badge/Redis-Upstash-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://upstash.com)
 [![Render](https://img.shields.io/badge/Render-CI%2FCD-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://render.com)
 [![Meta API](https://img.shields.io/badge/Meta_Graph-API_v22-0866FF?style=for-the-badge&logo=messenger&logoColor=white)](https://developers.facebook.com)
 [![Claude](https://img.shields.io/badge/Claude_Opus-Architectural_Reasoning-CC785C?style=for-the-badge&logo=anthropic&logoColor=white)](https://anthropic.com)
@@ -30,7 +31,7 @@ Sofia was engineered to solve a real production problem: most AI-powered shop bo
 
 The architecture addresses this with a **strict separation of concerns**. A deterministic rule engine has exclusive ownership of all product data — prices, SKUs, availability. A probabilistic AI layer (Gemini 2.5 Flash Lite) handles everything else: conversation, sizing questions, shipping queries, general brand interaction. The two layers never overlap. The result is a system with the accuracy of a database and the fluency of a language model.
 
-**Deployed on Render. Integrated with Meta Graph API v22. Built and debugged with an AI-augmented development workflow using Cursor, Claude Opus, and Gemini 2.5 Flash Lite.**
+**Deployed on Render. Integrated with Meta Graph API v22. Session state and deduplication backed by Upstash Redis. Built and debugged with an AI-augmented development workflow using Cursor, Claude Opus, and Gemini 2.5 Flash Lite.**
 
 <br>
 
@@ -44,14 +45,14 @@ graph TD
     B -->|Invalid HMAC-SHA256| C[403 Rejected]
     B -->|Valid| D{Echo Filter}
     D -->|is_echo = true| E[Admin Echo Handler\n_handle_admin_echo]
-    D -->|is_echo = false| F{Deduplication Check\ndeque maxlen=100}
+    D -->|is_echo = false| F{Deduplication Check\nRedis SETNX · 5-min TTL}
     F -->|Duplicate mid| G[Silently Dropped]
-    F -->|New mid| H{Bot Paused?\n_is_paused}
+    F -->|New mid| H{Bot Paused?\n_is_paused — Redis session}
     H -->|Paused| I[Message Ignored\nAdmin has thread]
     H -->|Active| J{Hybrid Routing Engine}
 
-    J -->|First contact?| K[_send_first_time_greeting\nName + Default Carousel]
-    J -->|Escalation keyword?| L[SMTP Alert + Bot Pause\n_notify_admin]
+    J -->|Escalation keyword?| K[SMTP Alert + Bot Pause\n_notify_admin]
+    J -->|First contact?| L[_send_first_time_greeting\nName + Default Carousel]
     J -->|Browse intent?| M[_build_default_carousel\nCategory-Filtered JSON]
     J -->|Greeting keyword?| N[Intercept — Short Reply\n_GREETING_KEYWORDS set]
     J -->|Product match?| O{_search_products\n3-Pass Rule Engine}
@@ -86,6 +87,7 @@ This project was built using a **multi-model AI orchestration workflow** — a d
 | HMAC security implementation | **Claude Opus** | Formal verification reasoning for timing-oracle threat model |
 | Prompt engineering (Sofia persona) | **Gemini 2.5 Flash Lite** | In-domain testing of Taglish response quality |
 | Code review and dedup logic | **Claude Opus** | Systematic audit for race conditions in concurrent sessions |
+| Redis session architecture | **Claude Opus** | Persistence strategy across Render restart/rebuild cycles |
 | IDE Integration | **Cursor** | AI-native code navigation and inline refactoring |
 
 ### Key Resolution: Gunicorn Worker Synchronization
@@ -113,10 +115,11 @@ if __name__ == "__main__":
 
 **Confirmed in production logs:**
 ```
+Redis connected: ap-southeast-1.upstash.io:PORT
 Environment validated.
 Gemini configured (model: gemini-2.5-flash-lite).
 Scheduler started — cache refresh every 60 min.
-Cache refreshed — 60 products loaded.          ← Proof of fix
+Cache refreshed — 60 products loaded.
 ```
 
 <br>
@@ -147,7 +150,7 @@ This architectural boundary is the reason Sofia cannot hallucinate product infor
 
 ### 2. State-Aware UX Engineering
 
-**Contextual Session Management** is handled via a per-PSID session dictionary with three tracked fields: `greeted`, `paused`, and `email_ts`. All mutations are protected by a single `threading.Lock`.
+**Contextual Session Management** is handled via a per-PSID session stored in Redis (Upstash) with three tracked fields: `greeted`, `paused`, and `email_ts`. All mutations are protected by a `threading.Lock` to ensure single-process atomicity, with Redis providing cross-restart persistence.
 
 The `_GREETING_KEYWORDS` interceptor demonstrates the most nuanced state decision in the routing engine:
 
@@ -170,26 +173,30 @@ _GREETING_KEYWORDS = frozenset({
 | `greeted=True` | Click Get Started again | Postback → `_is_first_time` → False | Catalog-only quick access |
 | `paused=True` | Any message | Paused guard | Silently ignored — admin has thread |
 
-**Zero double-greetings across all entry paths.** Verified by tracing all five user journey scenarios.
+**Zero double-greetings across all entry paths.** Verified by tracing all five user journey scenarios. Session state survives Render restarts because it is persisted in Redis, not in-memory.
 
 ### 3. Resiliency and Scalability
 
-**Message Deduplication via Rolling Deque**
+**Message Deduplication via Redis SETNX**
 
 Facebook's webhook delivery guarantee is "at least once" — not "exactly once." Under load, a Gemini API call exceeding Facebook's timeout threshold triggers a retry, resulting in duplicate processing.
 
 ```python
-_seen_message_ids: deque[str] = deque(maxlen=100)
-
 def _is_duplicate(mid: str) -> bool:
+    if _redis is not None:
+        # SET NX EX: atomic check-and-set. Returns None if key already existed.
+        added = _redis.set(f"seen:{mid}", "1", nx=True, ex=DEDUP_TTL_SECS)
+        return added is None   # None = duplicate, True = new message
+
+    # In-memory fallback when Redis is unavailable (local dev)
     with _state_lock:
         if mid in _seen_message_ids:
-            return True          # Already processed — drop
+            return True
         _seen_message_ids.append(mid)
-        return False             # New message — process
+        return False
 ```
 
-`deque(maxlen=100)` provides O(1) append with automatic eviction of the oldest ID. At production scale, this would migrate to a Redis SET with TTL — the interface is identical.
+Redis SETNX is atomic — no race condition is possible even across multiple threads. Message IDs expire automatically after 5 minutes. An in-memory `deque(maxlen=100)` fallback is retained for local development without Redis.
 
 **HMAC-SHA256 Webhook Signature Verification**
 
@@ -239,7 +246,7 @@ def _allow_email(psid: str) -> bool:
     return True
 ```
 
-On trigger: customer receives a Taglish apology, admin receives a structured alert (name, PSID, message, timestamp), and the bot sets `paused=True` for that thread. Admin resumes by typing `bot` or `sofia` in the Page inbox.
+Rate-limit timestamps are stored inside the Redis session so they persist correctly across restarts. On trigger: customer receives a Taglish apology, admin receives a structured alert (name, PSID, message, timestamp), and the bot sets `paused=True` for that thread. Admin resumes by typing `bot` or `sofia` in the Page inbox.
 
 <br>
 
@@ -251,11 +258,11 @@ On trigger: customer receives a Taglish apology, admin receives a structured ale
 |:---|:---|:---|
 | **Dynamic Carousel Rendering** | Runtime JSON assembly, defensive price parsing, `_stock_label()` mapping | Accurate product cards with live stock status on every query |
 | **Hybrid Logic Routing** | 6-step deterministic pipeline before probabilistic fallback | Zero price hallucination, sub-2s response on rule matches |
-| **Contextual Session Management** | Per-PSID `threading.Lock`-protected state dict | No duplicate greetings, correct admin/bot thread ownership |
+| **Redis Session Persistence** | Per-PSID state stored in Upstash Redis, 90-day TTL, in-memory fallback | Sessions survive Render restarts — no spam greetings on wake |
 | **SMTP Escalation** | Sliding-window rate limiter, smtplib STARTTLS, bot auto-pause | Admin notified only for real escalations, never spammed |
 | **Production Bootstrapping** | Module-level `_validate_env()` + `_startup()` triggers | Cache populated at Gunicorn import — zero cold-start latency |
 | **Webhook Security** | HMAC-SHA256 + `hmac.compare_digest` + 1MB body cap | Forged payloads rejected before application code runs |
-| **Message Deduplication** | `deque(maxlen=100)` rolling ID window | Facebook retry floods silently dropped — no double-replies |
+| **Message Deduplication** | Redis SETNX with 5-min TTL (deque fallback for local dev) | Facebook retry floods silently dropped — no double-replies |
 | **SSRF Prevention** | Regex pattern validation on `GITHUB_PRODUCTS_URL` at boot | Internal network requests blocked if env var is misconfigured |
 
 <br>
@@ -269,6 +276,7 @@ On trigger: customer receives a Taglish apology, admin receives a structured ale
 | **Backend / Middleware** | Python 3.11+ / Flask 3.x | Webhook server and routing engine |
 | **AI Core** | Google Gemini 2.5 Flash Lite | Conversational fallback with persona enforcement |
 | **Messenger API** | Meta Graph API v22 | Message delivery, Generic Templates, postbacks |
+| **Session & Dedup** | Redis (Upstash) | Persistent session state + atomic deduplication |
 | **Product Data** | GitHub-hosted JSON | Live catalog with 60-min auto-refresh via APScheduler |
 | **Email** | smtplib + Gmail SMTP + STARTTLS | Rate-limited admin escalation alerts |
 | **Security** | HMAC-SHA256 + `hmac.compare_digest` | Signed webhook verification |
@@ -276,7 +284,7 @@ On trigger: customer receives a Taglish apology, admin receives a structured ale
 | **IDE / Tooling** | Cursor + Claude Opus + GitHub | AI-augmented development and architectural review |
 | **Deployment** | Render (CI/CD on `git push main`) | Auto-deploy production hosting |
 | **Local Dev** | ngrok + python-dotenv | HTTPS tunnel and local environment isolation |
-| **Process Manager** | Gunicorn (`--workers 1 --threads 4`) | Single-worker threading to preserve in-memory session state |
+| **Process Manager** | Gunicorn (`--workers 1 --threads 4`) | Single-worker threading with Redis-backed shared state |
 
 <br>
 
@@ -287,10 +295,10 @@ On trigger: customer receives a Taglish apology, admin receives a structured ale
 ```
 Hybrid-AI-Messenger-Bot/
 ├── messenger_bot_test.py   # Core middleware — 7 sections, fully documented
-│                           # Sections: Security · Memory · Data · API Handlers
+│                           # Sections: Security · Memory/Redis · Data · API Handlers
 │                           #           Routing Engine · Flask Routes · Startup
 ├── products.json           # Live product catalog — edit to update Sofia instantly
-├── requirements.txt        # Pinned dependencies
+├── requirements.txt        # Pinned dependencies (includes redis>=5.0,<6.0)
 ├── Procfile                # gunicorn --workers 1 --threads 4 messenger_bot_test:app
 ├── runtime.txt             # python-3.11.9
 ├── privacy.html            # Meta platform policy compliance
@@ -342,7 +350,26 @@ def _stock_label(availability: str) -> str:
     }
     return labels.get(str(availability).strip(), "Out of Stock")
 ```
-Applied consistently across `send_carousel()` and `_send_product_detail()`.
+
+---
+
+### Challenge 4 — Session Loss on Render Sleep / Restart
+**Symptom:** After ~15 minutes of inactivity, Render spins down the free-tier service. On wake, all in-memory state (`_user_sessions`, `_seen_message_ids`) was wiped. Facebook queued retries arrived simultaneously, each hitting `_is_first_time()` with `greeted=False`, sending 3–4 welcome messages to the same user.
+
+**Root Cause:** In-memory Python dicts don't survive process termination. Free-tier Render instances restart on any new request after idle timeout. No external state store meant every restart was a clean slate.
+
+**Resolution:** Migrated session storage and deduplication to **Upstash Redis**:
+- Sessions stored as JSON under `session:{psid}` keys with 90-day TTL
+- Message IDs stored under `seen:{mid}` keys with 5-minute TTL using atomic `SETNX`
+- In-memory fallback retained for local development without `REDIS_URL`
+
+```python
+# Atomic dedup — no race condition possible
+added = _redis.set(f"seen:{mid}", "1", nx=True, ex=300)
+return added is None  # None = key existed = duplicate
+```
+
+Sessions now survive restarts, rebuilds, and idle spin-downs completely.
 
 <br>
 
@@ -370,10 +397,13 @@ VERIFY_TOKEN=your_value
 GEMINI_API_KEY=your_value
 GITHUB_PRODUCTS_URL=https://raw.githubusercontent.com/Lawrenzie09/Hybrid-AI-Messenger-Bot/main/products.json
 SENDER_EMAIL=your_gmail@gmail.com
-SENDER_PASSWORD=your_app_password
+SENDER_PASSWORD=your_16char_app_password
 RECEIVER_EMAIL=admin@example.com
 HEALTH_TOKEN=any_random_string
+REDIS_URL=redis://default:password@region.upstash.io:port
 ```
+
+> **Note:** `REDIS_URL` is optional for local dev. If omitted, the bot falls back to in-memory session storage automatically.
 
 Add locally only (remove before push):
 ```python
@@ -396,14 +426,15 @@ ngrok http 5000
 ## Deployment on Render
 
 1. Push to GitHub — Render auto-deploys on `git push main`
-2. Add all env vars in Render → Environment tab
-3. Add `FB_APP_SECRET` and `PAGE_ACCESS_TOKEN` as Secret Files at `/etc/secrets/`
+2. Add all env vars in Render → **Environment** tab:
+   - `VERIFY_TOKEN`, `GEMINI_API_KEY`, `SENDER_EMAIL`, `SENDER_PASSWORD`, `RECEIVER_EMAIL`, `HEALTH_TOKEN`, `GITHUB_PRODUCTS_URL`, `REDIS_URL`
+3. Add `FB_APP_SECRET` and `PAGE_ACCESS_TOKEN` as **Secret Files** at `/etc/secrets/`
 4. Confirm `Procfile`:
    ```
    web: gunicorn --workers 1 --threads 4 messenger_bot_test:app
    ```
 
-**Note on `--workers 1`:** Multiple workers create separate Python processes with isolated memory. `_user_sessions`, `_seen_message_ids`, and `_products_cache` are all in-memory. Worker 2 would not know a user was already greeted by Worker 1. Single worker + 4 threads provides concurrency without state fragmentation.
+**Note on `--workers 1`:** Multiple Gunicorn workers create separate Python processes. The in-memory product cache (`_products_cache`) and APScheduler instance are not shared across workers — running multiple workers would cause each to maintain its own independent cache refresh cycle. Session state is handled by Redis and is cross-worker safe, but the cache layer keeps this deployment at single-worker for simplicity.
 
 <br>
 
@@ -423,6 +454,7 @@ ngrok http 5000
 | 8 | Bot resume | Admin types `bot` | Sofia resumes, customer notified |
 | 9 | AI fallback | `ano po sizing niyo?` | Gemini Taglish reply |
 | 10 | Security — unsigned request | Forged POST | `403 Forbidden` |
+| 11 | Session persistence | Restart Render service, message again | No repeat greeting — Redis session intact |
 
 <br>
 
@@ -432,7 +464,7 @@ ngrok http 5000
 
 <div align="center">
 
-**Open to roles in Junior AI Automation Engineer, Junior AI Automation Specialist, and Junior AI Prompt Engineer.**
+**Open to roles in Junior AI Automation Engineer, Junior AI Automation Specialist, and AI Prompt Engineer.**
 
 Experienced in production Python systems, AI-augmented development workflows, webhook architecture, and deploying real products used by real customers.
 
@@ -451,7 +483,7 @@ Experienced in production Python systems, AI-augmented development workflows, we
 • Junior AI Automation Engineer <br>
 • Junior AI Automation Specialist <br>
 • Custom Messenger Bot Development <br>
-• Junior AI Prompt Engineer
+• AI Prompt Engineer
 
 <br>
 
